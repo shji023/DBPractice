@@ -47,10 +47,10 @@ update table01 set age = 99 where name = '안중근';
 update table01 set name = '소나무' where id = 4;
 update table01 set name = '대나무', age =  888 where id = 4;
 
--- ex12) delete
+-- ex13) delete
 delete from table01 where name = '홍길동';
 
--- ex13)
+-- ex14)
 -- 모두채울때 (묵시적 방법)
 insert into table01 values(null,'유니콘',20,300);
 -- 선택적으로 채울 때 (명시적 방법)
@@ -58,35 +58,35 @@ insert into table01(id, name, age, salary) values (null,'유니콘',20,300);
 insert into table01(id, age) values (null,20);
 insert into table01(age, id) values (120, null);
 
--- ex14) workBench에서 n개의 로우를 삭제할 때
+-- ex15) workBench에서 n개의 로우를 삭제할 때
 -- 우클릭을 이용하여 n개 삭제 가능 이지만 apply 안누르면 다시 보면 삭제 안되어있음
 
--- ex15) 로우의 개수를 출력
+-- ex16) 로우의 개수를 출력
 select count(*) from table01;
 
--- ex16) sakila db에서 검색 및 개수 출력
+-- ex17) sakila db에서 검색 및 개수 출력
 select * from actor;
 select * from city;
 select count(*) from city;
 -- 검색 로우의 개수가 다른것을 검색으로 같이 사용할 수 없다
 select count(*), city_id from city;
 
--- ex17) 출력개수 제한 - 0번부터 6개
+-- ex18) 출력개수 제한 - 0번부터 6개
 select * from city limit 0,6;
 select * from city limit 6;
 -- index 2번부터 3개
 select * from city limit 2,3;
 
--- ex18) 선택적으로 로우 검색
+-- ex19) 선택적으로 로우 검색
 select name from table01;
 select id, name from table01;
 select id, name, name from table01;
 
--- ex19) 선택컬럼에 산술식을 사용할 수 있다.
+-- ex20) 선택컬럼에 산술식을 사용할 수 있다.
 select name, salary from table01;
 select name, salary, salary*0.1 from table01;
 
--- ex20) 컬럼명에 별칭 사용
+-- ex21) 컬럼명에 별칭 사용
 select name as 이름, salary as 급여 from table01;
 select name, salary * 0.1 as 보너스, salary+salary*0.1 as 실수령액 from table01;
 
@@ -99,25 +99,25 @@ select name `이 름`, salary `급 여` from table01;
 -- 단순 쿼리 정리
 select name `이 름`, salary * 12 `연    봉` from table01;
 
--- ex21) 컬럼연결이 필요한 경우(컬럼+컬럼 >> 컬럼컬럼)
+-- ex22) 컬럼연결이 필요한 경우(컬럼+컬럼 >> 컬럼컬럼)
 select concat(name, salary) 이름급여 from table01;
 select concat(name, '님의 급여는', salary,'원입니다') 이름급여 from table01;
 select concat('님의 급여는', concat (salary,'원입니다')) 이름급여 from table01;
 
--- ex22) 단순 산술식이나 날짜를 얻고 싶을때 - 가상테이블
+-- ex23) 단순 산술식이나 날짜를 얻고 싶을때 - 가상테이블
 select 3*5 from dual;
 select sysdate(), 3*7 from dual;
 -- 몫값은 실제 연산 결과 값이다. 소숫점까지
 select 9+2, 9-2, 9*2, 9/2, 9%2 from dual;
 
--- ex23) null 검색
+-- ex24) null 검색
 select * from table01;
 select * from table01 where salary = null; -- 아주 조심 해야하는 문장
 select * from table01 where salary is null;
 select name from table01 where salary is not null;
 select name `급여를 받는 사람` from table01 where salary is not null;
 
--- ex24)
+-- ex25) 직원들의 연간 총소득을 모두 검색하여 출력
 CREATE TABLE table02 (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(45),
@@ -125,7 +125,6 @@ CREATE TABLE table02 (
   bonus INT,
   PRIMARY KEY (id));
 
--- ex25) 직원들의 연간 총소득을 모두 검색하여 출력
 insert into table02 values(null, '호랑이1', 100, 10);
 insert into table02 values(null, '호랑이2', 200, null);
 insert into table02 values(null, '호랑이3', 300, 40);
@@ -155,7 +154,7 @@ insert into table03 values(null, '호랑이5', 2.8);
 select * from table03;
 select result, result *100/4.5 '100점대 환산' from table03;
 
--- ex28 중복제거
+-- ex28) 중복제거
 CREATE TABLE table04 (
   id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(16),
@@ -200,3 +199,49 @@ select * from table05 order by gold_num desc;
 select * from table05 order by 3 desc; -- 컬럼인덱스로 정렬가능
 select * from table05 order by gold_num desc, silver_num desc; -- 1차 정렬에서 동일한 값에서 2차 정렬 
 
+-- ex30) 정렬
+CREATE TABLE table06 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45),
+  dept VARCHAR(16),
+  salary INT,
+  PRIMARY KEY (id));
+  
+insert into table06 values(null,'이순신','경영',500);
+insert into table06 values(null,'홍길동','인사',200);
+insert into table06 values(null,'안중근','회계',300);
+insert into table06 values(null,'호랑이','인사',400);
+insert into table06 values(null,'코기리','개발',100);
+insert into table06 values(null,'안중근','회계',700);
+insert into table06 values(null,'호랑이','인사',50);
+insert into table06 values(null,'코기리','개발',550);
+
+-- 부서별로 순차 정렬을 하고 급여를 역순 정렬해서 나타내세요.
+select * from table06 order by dept asc, salary desc;
+-- ~~별로(나라별로, 부서별로, 성별로, 학과별로)
+-- 1. order by(단순검색)       2. group by 거의 대부분, 통계자료를 뽑고 싶을 때
+
+-- ex31) 성적 합에 대한 역순 정렬 (키포인트는 별칭 사용)
+CREATE TABLE table07 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45),
+  kor int,
+  eng int,
+  mat int,
+  PRIMARY KEY (id));
+  
+insert into table07 values(null,'호랑이',66, 78, 80);
+insert into table07 values(null,'코기리',80, 79, 92);
+insert into table07 values(null,'안중근',98, 94, 100);
+insert into table07 values(null,'호랑이',77, 67, 90);
+insert into table07 values(null,'코기리',75, 86, 98);
+
+select * from table07;
+select name, kor+eng+mat total from table07 order by total desc;
+
+-- ex32) 대소비교(=, !=, >, >=, <=)
+select * from table07 where kor > 80;
+select name, (kor+eng+mat)/3 result from table07 where (kor+eng+mat)/3 >= 80;
+-- 될것 같은데 안된다. select에서 정의된 별칭은 where에서 사용할 수 없음.
+-- 테이블 이름을 별칭으로 만들 수가 있는데, 이때 만든 별칭은 where에서 사용할 수 있음
+select name, (kor+eng+mat)/3 result from table07 where result >= 80; -- err
