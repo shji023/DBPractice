@@ -135,3 +135,48 @@ insert into table02 values(null, '호랑이5', 500, null);
 select salary * 12 + bonus from table02; -- 보너스가 null인 컬럼 계산 안되고 있음
 -- 테이블 업데이트 하지 말고
 select salary * 12 + ifnull(bonus, 0) from table02;
+
+-- ex26) table02의 bonus가 null인 컬럼을 0으로 수정(갱신)하세요.
+update table02 set bonus=0 where bonus is null;
+select * from table02;
+
+-- ex27) 4.5만점의 학점을 100점기준으로 환산한 값은
+CREATE TABLE table03 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(16),
+  result float,
+  PRIMARY KEY (id));
+  
+insert into table03 values(null, '호랑이1', 4.5);
+insert into table03 values(null, '호랑이2', 4.0);
+insert into table03 values(null, '호랑이3', 3.2);
+insert into table03 values(null, '호랑이4', 3.6);
+insert into table03 values(null, '호랑이5', 2.8);
+select * from table03;
+select result, result *100/4.5 '100점대 환산' from table03;
+
+-- ex28 중복제거
+CREATE TABLE table04 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(16),
+  country VARCHAR(16),
+  PRIMARY KEY (id));
+  
+insert into table04 values(null, '호랑이1', '한국');
+insert into table04 values(null, '호랑이2', '한국');
+insert into table04 values(null, '호랑이1', '중국');
+insert into table04 values(null, '호랑이2', '미국');
+insert into table04 values(null, '호랑이3', '한국');
+insert into table04 values(null, '호랑이4', '중국');
+insert into table04 values(null, '호랑이2', '한국');
+-- 값이 null인 경우는 집계에 포함되지 않는다.
+insert into table04 values(null, '호랑이5', null);
+select * from table04;
+select distinct name from table04;
+-- 중복제거된 목록
+select distinct(country) from table04;
+-- 중복제거된 목록의 개수
+select count(distinct(country))from table04;
+
+
+
