@@ -178,5 +178,25 @@ select distinct(country) from table04;
 -- 중복제거된 목록의 개수
 select count(distinct(country))from table04;
 
+-- ex29) 정렬 결과
+CREATE TABLE table05 (
+  id INT NOT NULL AUTO_INCREMENT, -- 컬럼1
+  name VARCHAR(16),				  -- 컬럼2
+  gold_num int,					  -- 컬럼3
+  silver_num int,
+  PRIMARY KEY (id));
+  
+insert into table05 values(null, '일본', 1, 2);
+insert into table05 values(null, '미국', 2, 3);
+insert into table05 values(null, '한국', 10, 10);
+insert into table05 values(null, '중국', 2, 4);
+insert into table05 values(null, '독일', 4, 8);
 
+-- 금메달 기준
+-- asc는 생략 가능: 오름차순, 순차정렬
+select * from table05 order by gold_num asc;
+-- 테이블이 수정되는 것은 아님
+select * from table05 order by gold_num desc;
+select * from table05 order by 3 desc; -- 컬럼인덱스로 정렬가능
+select * from table05 order by gold_num desc, silver_num desc; -- 1차 정렬에서 동일한 값에서 2차 정렬 
 
