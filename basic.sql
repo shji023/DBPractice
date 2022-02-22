@@ -354,20 +354,20 @@ select *
 from table11
 where dept in ('개발','경영');
 
--- ex41) any 안에서 제일 작은 숫자를 찾음, all 가장 큰 숫자 찾음
+-- ex41) 
 select * 
 from table11
 where salary > ANY(300, 200, 250);
--- 번역 결과 : where salary > 200;
+-- 번역 결과 : where salary > 200; 최소값보다 크면
 
 -- where salary > All(300, 200, 250);
--- 번역 결과 : where salary > 300;
+-- 번역 결과 : where salary > 300; 최댓값보다 크면
 
 -- where salary < ANY(300, 200, 250);
--- 번역 결과 : where salary < 300;
+-- 번역 결과 : where salary < 300; 최댓값보다 작으면
 
 -- where salary < All(300, 200, 250);
--- 번역 결과 : where salary < 200;
+-- 번역 결과 : where salary < 200; 최소값 보다 작으면
 
 -- 문제) 20번 부서의 최고 월급보다 적은 연봉을 받는 직원을 검색하세요
 CREATE TABLE table12 (
@@ -415,3 +415,8 @@ where eno = 20);
 select eno, name from table12
 where salary < ANY(select salary from table12
 where eno = 20) and eno!=20;
+
+-- 유사 예제
+-- 문제 컴공과에서 제일 낮은 점수를 받은 학생보다 성적이 낮은 학생들은?
+select name from univ
+where score < all(select score from univ where dept='컴공');
