@@ -31,9 +31,9 @@ drop table table01;
 -- ex10) DB를 사용하는 근본 목적 : CRUD
 -- Create(로우 생성)
 -- insert into 테이블명 values(값,); 암기!
-insert into table01 values(null,'이순신',20,300);
-insert into table01 values(null,'홍길동',21,200);
-insert into table01 values(null,'안중근',22,300);
+insert into table01 values(null,'현지영',20,300);
+insert into table01 values(null,'조영우',21,200);
+insert into table01 values(null,'남궁윤호',22,300);
 insert into table01 values(null,'호랑이',23,400);
 insert into table01 values(null,'코기리',null,null);
 -- ex11) Read:조회
@@ -245,3 +245,126 @@ select name, (kor+eng+mat)/3 result from table07 where (kor+eng+mat)/3 >= 80;
 -- 될것 같은데 안된다. select에서 정의된 별칭은 where에서 사용할 수 없음.
 -- 테이블 이름을 별칭으로 만들 수가 있는데, 이때 만든 별칭은 where에서 사용할 수 있음
 select name, (kor+eng+mat)/3 result from table07 where result >= 80; -- err
+
+-- ex33) and, or 사용
+CREATE TABLE table08 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45),
+  dept VARCHAR(16),
+  salary INT,
+  PRIMARY KEY (id));
+  
+insert into table08 values(null,'이순신','경영',500);
+insert into table08 values(null,'홍길동','인사',200);
+insert into table08 values(null,'안중근','회계',300);
+insert into table08 values(null,'호랑이','인사',400);
+insert into table08 values(null,'코기리','개발',100);
+select id, name, dept, salary -- *대신에 컬럼명을 명시하는것을 추천한다.
+from table08
+where dept ='인사' and salary > 350;
+
+select id, name, dept, salary
+from table08
+where dept = '개발' and salary < 350;
+
+select id, name, dept, salary
+from table08
+where salary>=160 and salary < 350;
+
+select id, name, dept, salary
+from table08
+where salary < 160 or salary > 600;
+
+-- ex34) Like 글자 찾고 싶을 때
+CREATE TABLE table09 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45),
+  salary INT,
+  PRIMARY KEY (id));
+  
+insert into table09 values(null,'스타벅스',500);
+insert into table09 values(null,'풀스타노래방',200);
+insert into table09 values(null,'강남만두',300);
+insert into table09 values(null,'스타일미용실',400);
+insert into table09 values(null,'닭다리스타',100);
+insert into table09 values(null,'짬뽕천국',400);
+-- 스타로 시작하는
+select * from table09
+where name like '스타%';
+-- 스타로 끝나는
+select * from table09
+where name like '%스타';
+-- 스타가 들어있는
+select * from table09
+where name like '%스타%';
+-- 스타가 들어있는 이름의 갯수
+select count(name) from table09
+where name like '%스타%';
+
+CREATE TABLE table10 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45),
+  grade INT,
+  PRIMARY KEY (id));
+  
+insert into table10 values(null,'김유신',1);
+insert into table10 values(null,'이순신',2);
+insert into table10 values(null,'김서',3);
+insert into table10 values(null,'김김김',4);
+insert into table10 values(null,'홍길동',1);
+insert into table10 values(null,'김장',1);
+-- 1학년 중에서 김씨는 몇명인가?
+select * from table10
+where name like '김%' and grade = 1;
+
+-- ex37) 이름이 2글자인 사람 검색
+select * from table10
+where name like '__';
+
+-- ex38) 성과이름이 3글자가 아닌 사람 검색
+select * from table10
+where name not like '___';
+
+-- ex39) between A and B
+-- 반드시 A<B 이어야함
+CREATE TABLE table11 (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(45),
+  dept VARCHAR(16),
+  salary INT,
+  PRIMARY KEY (id));
+  
+insert into table11 values(null,'이순신','경영',500);
+insert into table11 values(null,'홍길동','인사',200);
+insert into table11 values(null,'안중근','회계',300);
+insert into table11 values(null,'호랑이','인사',400);
+insert into table11 values(null,'코기리','개발',100);
+
+-- 가독성이 높아서 사용한다.
+select * 
+from table11
+where salary between 200 and 600;
+-- where 학점 between 4.0 and 4.5; 
+
+-- ex40) in - 여러개 넣을 수 있음
+select * 
+from table11
+where dept = '개발' or dept='경영';
+select * 
+from table11
+where dept in ('개발','경영');
+
+-- ex41) any 안에서 제일 작은 숫자를 찾음, all 가장 큰 숫자 찾음
+select * 
+from table11
+where salary > ANY(300, 200, 250);
+-- 번역 결과 : where salary > 200;
+
+-- where salary > All(300, 200, 250);
+-- 번역 결과 : where salary > 300;
+
+-- where salary < ANY(300, 200, 250);
+-- 번역 결과 : where salary < 300;
+
+-- where salary < All(300, 200, 250);
+-- 번역 결과 : where salary < 200;
