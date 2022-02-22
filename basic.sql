@@ -368,3 +368,50 @@ where salary > ANY(300, 200, 250);
 
 -- where salary < All(300, 200, 250);
 -- 번역 결과 : where salary < 200;
+
+-- 문제) 20번 부서의 최고 월급보다 적은 연봉을 받는 직원을 검색하세요
+CREATE TABLE table12 (
+  id INT NOT NULL AUTO_INCREMENT,
+  eno int, -- 부서번호
+  name VARCHAR(16),
+  salary INT,
+  PRIMARY KEY (id));
+  
+insert into table12 values(null,10,'tiger1',100);
+insert into table12 values(null,20,'tiger2',200);
+insert into table12 values(null,30,'tiger3',300);
+insert into table12 values(null,40,'tiger4',400);
+insert into table12 values(null,10,'tiger5',500);
+insert into table12 values(null,20,'tiger6',600);
+insert into table12 values(null,30,'tiger7',700);
+insert into table12 values(null,40,'tiger8',800);
+insert into table12 values(null,10,'tiger9',350);
+insert into table12 values(null,20,'tiger10',450);
+
+-- 20번 부서의 급여를 모두 검색한다.
+select salary from table12
+where eno=20;
+-- 20번 부서의 최고 급여는 얼마인가?
+select max(salary) from table12
+where eno = 20;
+-- 20번 부서의 최고 급여를 받는 직원의 이름은 무엇입니까?
+select name from table12
+where salary = 600;
+-- sub query
+select name from table12
+where salary = (select max(salary) from table12
+where eno = 20);
+
+select name from table12
+where salary < (select max(salary) from table12
+where eno = 20);
+
+-- where salary < ANY(300, 200, 250);
+select eno, name from table12
+where salary < ANY(select salary from table12
+where eno = 20);
+
+-- 이 중 20번인 사람은 제외
+select eno, name from table12
+where salary < ANY(select salary from table12
+where eno = 20) and eno!=20;
