@@ -420,3 +420,113 @@ where eno = 20) and eno!=20;
 -- 문제 컴공과에서 제일 낮은 점수를 받은 학생보다 성적이 낮은 학생들은?
 select name from univ
 where score < all(select score from univ where dept='컴공');
+
+-- ex42) 통계함수
+select min(salary) from table12;
+select max(salary) from table12;
+select avg(salary) from table12;
+select sum(salary) from table12;
+
+-- 실제 이름을 얻을 때
+select name from table12
+where salary = (select max(salary) from table12);
+
+-- ex43) join : 오라클 join문법, ansi join문법(표준)
+-- 두개이상의 테이블을 합병
+-- 1. 8개의 다양한 조인 유형
+
+drop table tableA;
+-- ex44) 교차조인(cross join): 데카르트 곱, 카데시안 곱
+-- A table의 로우가 3개, b table의 로우가 4개일 때
+CREATE TABLE tableA (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(16),
+  eno int, -- 직업번호
+  salary INT,
+  PRIMARY KEY (id));
+  
+insert into tableA values(null,'홍길동',10,1000);
+insert into tableA values(null,'이순신',20,2000);
+insert into tableA values(null,'안중근',30,3000);
+insert into tableA values(null,'임꺽정',40,4000);
+select * from tableA;
+
+drop table tableB;
+-- ex44) 교차조인(cross join): 데카르트 곱, 카데시안 곱
+-- A table의 로우가 3개, b table의 로우가 4개일 때
+CREATE TABLE tableB (
+  id INT NOT NULL AUTO_INCREMENT,
+  eno int, 			-- 부서번호
+  job VARCHAR(16),  -- 직업
+  PRIMARY KEY (id));
+
+insert into tableB values(null,10,'장군');
+insert into tableB values(null,20,'의적');
+insert into tableB values(null,30,'의사');
+select * from tableB;
+
+-- 교차 조인 (일반적인 조인 방식) 
+-- 조인을 시키기 전에 조건을 따져봄
+select count(*) from tableA, tableB;
+
+-- 교차 조인(명시적인 안시 방식)
+select * from tableA
+cross join table02;
+
+-- ex45) 내부 조인(외부 조인이 아닌것)
+-- 내부 조인은 반드시 조건을 함께 써야하는데 안썼을 시 일단은 cross join처럼 보임
+select * from tableA
+inner join tableB;
+
+-- 정상적인 내부 조인 쿼리
+-- 조건에 만족하면 병합, 안하면 병합 x
+-- 내부적으로 교차조인 만큼의 비교는 함
+-- on -> 조인 조건!!
+-- where -> 필터 조건
+select * from tableA
+	inner join tableB
+	on tableA.eno = tableB.eno; -- 조인조건
+
+-- 등가조인이라고 한다( = )
+-- 같으냐고 안물으면 전부다 비등가 조인
+select * from tableA
+	inner join tableB
+	on tableA.eno = tableB.eno
+where salary >= 3000; -- 필터조건(검색 조건)
+
+-- ex46) 일반조인, 위에꺼랑 구분
+select * from tableA, tableB
+where tableA.eno = tableB.eno -- 조인 조건 
+and salary>=3000; -- 필터 조건, 검색조건
+
+-- ex47) 테이블 이름에 별칭(별명)을 사용할 수 있다.
+-- 정확하게는 별칭이라기보다는 리네임이다.
+select * from tableA t1, tableB t2
+where t1.eno = t2.eno -- 조인 조건 
+and salary>=3000; -- 필터 조건, 검색조건 (중복되는 이름이 없는 경우 t1.salary이렇게 써야할것을 t1. 생략해도됨)
+
+-- id는 컬럼명이 중복되므로 명시를 해주어야함
+select t1.eno, name, t1.id from tableA t1, tableB t2
+where t1.eno = t2.eno  
+and salary>=3000; 
+
+--  ex48) 잘못사용하고 있다. 조건을 왜줌
+select * from tableA
+	cross join tableB
+	on tableA.eno = tableB.eno; 
+    
+-- ex49) 잘못된 쿼리문 - 조인조건이 없으니까 교차조인이 일어난다. -> 교차조인이 일어난 것 가지고 필터링을 하는 것이기 때문
+select * from tableA
+	inner join tableB
+where tableA.eno = tableB.eno;
+
+-- ex50) 이순신의 직업은? - 두가지 방법!
+-- 등가 조인 사용 방법 - 서브쿼리보다 조인을 사용하는 것이 훨씬 낫다
+select name, job from tableA t1, tableB t2
+where t1.eno = t2.eno
+and t1.name = '이순신';
+
+-- 서브쿼리 이용하는 방법
+select job from tableB
+where eno = (select eno from tableA where name='이순신');
+-- 교차조인, 내부조인, 등가조인          (일반조인, 안시조인)
