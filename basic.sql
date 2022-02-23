@@ -529,4 +529,196 @@ and t1.name = '이순신';
 -- 서브쿼리 이용하는 방법
 select job from tableB
 where eno = (select eno from tableA where name='이순신');
+
+-- ex51) 모대학에서 2학점인 과목을 검색하고, 이 과목을 강의하는 교수를 검색하세요.
+-- 교수 테이블
+CREATE TABLE tableA (
+  id INT NOT NULL AUTO_INCREMENT,
+  pno int,			-- 교수번호
+  name VARCHAR(10), -- 교수이름
+  PRIMARY KEY (id));
+  
+insert into tableA values(null, 100, '홍길동1');
+insert into tableA values(null, 101, '홍길동2');
+insert into tableA values(null, 102, '홍길동3');
+insert into tableA values(null, 104, '홍길동4');
+insert into tableA values(null, 105, '홍길동5');
+
+-- 과목 테이블
+CREATE TABLE tableB (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(16), -- 과목명
+  num int, 			-- 학점
+  pno int, 			-- 담당교수번호
+  PRIMARY KEY (id));
+
+insert into tableB values(null,'국어', 4, 103);
+insert into tableB values(null,'영어', 3, 104);
+insert into tableB values(null,'수학', 2, 102);
+insert into tableB values(null,'사회', 1, 101);
+insert into tableB values(null,'체육', 2, 103);
+insert into tableB values(null,'과학', 2, 102);
+
+select * from tableA t1
+	inner join tableB t2
+    on t1.pno = t2.pno
+where num = 2;
+
+-- ex52)
+CREATE TABLE tableA (
+  id INT NOT NULL AUTO_INCREMENT,
+  eno int,			-- 교수번호
+  name VARCHAR(10), -- 교수이름
+  major VARCHAR(10), -- 교수이름
+  year int,			-- 교수번호
+  PRIMARY KEY (id));
+insert into tableA values(null, 1000, '홍길동1','국어',1);
+insert into tableA values(null, 1001, '홍길동2','화학',1);
+insert into tableA values(null, 1002, '홍길동3','화학',2);
+insert into tableA values(null, 1003, '홍길동4','국어',2);
+insert into tableA values(null, 1004, '홍길동5','화학',1);
+CREATE TABLE tableB (
+  b_id INT NOT NULL AUTO_INCREMENT,
+  eno int,			
+  cno int, 
+  result int, 
+  PRIMARY KEY (b_id));
+  
+insert into tableB values(null,1000, 10, 59);
+insert into tableB values(null,1000, 20, 34);
+insert into tableB values(null,1001, 10, 80);
+insert into tableB values(null,1001, 20, 79);
+insert into tableB values(null,1001, 30, 33);
+insert into tableB values(null,1002, 20, 48);
+insert into tableB values(null,1003, 30, 55);
+insert into tableB values(null,1004, 10, 99);
+
+select t2.result from tableA t1
+	inner join tableb t2
+    on t1.eno = t2.eno
+where t1.major = '화학' and t1.year = 1;
+
+-- 다른 답안
+select *
+from tableA t1, tableB t2
+where t1.eno = t2.eno
+and major = '화학' and year = 1;
+
+-- ex53) 자연조건 - 너가 컬럼명을 양쪽 테이블에서 보고 똑같은게 있으면 조인해라 
+-- 양쪽 테이블에서 컬럼명이 동일한 것이 1개이상있다는 전제하에 
+-- eno가 같은 컬럼명이므로 자동으로 eno기준으로 조인
+select * from tableA
+	natural join tableB;
+    
+select * from tableA
+	natural join tableB
+where year = 1;
+
+-- ex53) using 조인: 컬럼명이 어쩔 수 없이 2개 이상 중복된 경우의 조인 
+-- 컬럼을 꼭 찍어서 조인을 시킬 수 있다.
+
+select * from tableA
+	join tableB using(eno)
+where year = 1;
+
+-- ex54) 비등가조인:  (=) 을 제외한 비교연산
+CREATE TABLE tableA (
+  id_a INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(10), -- 이름
+  eno int,			-- 부서번호, 직급번호
+  salary int,
+  PRIMARY KEY (id_a));
+  
+insert into tableA values(null, '홍길동1',20,50);
+insert into tableA values(null, '홍길동2',10,150);
+insert into tableA values(null, '홍길동3',30,250);
+insert into tableA values(null, '홍길동4',20,350);
+insert into tableA values(null, '홍길동5',20,170);
+insert into tableA values(null, '홍길동5',20,370);
+
+-- 등급 테이블
+CREATE TABLE tableB (
+  id_b INT NOT NULL AUTO_INCREMENT,
+  grade VARCHAR(10), -- 이름
+  losalary int,		 -- 최소값 설정
+  hisalary int,		 -- 최대값 설정
+  PRIMARY KEY (id_b));
+
+insert into tableB values(null,'A', 300, 9999);
+insert into tableB values(null,'B', 200, 299);
+insert into tableB values(null,'C', 100, 199);
+insert into tableB values(null,'D', 0, 99);
+
+select name, grade from tableA t1
+	inner join tableB t2
+    on t1.salary >= t2.losalary 
+		and t1.salary <= t2.hisalary;
+        
+select name, grade from tableA t1
+	inner join tableB t2
+    on salary between t2.losalary and t2.hisalary;
+    
+-- 일반 조인
+select name, grade 
+from tableA t1, tableB t2
+where salary between t2.losalary and t2.hisalary;
+
+select name, grade 
+from tableA t1, tableB t2
+where salary between t2.losalary and t2.hisalary
+and grade='A';
+
+-- ex55) 셀프조인: 동일 테이블끼리 조인
+-- 홍길동 사원번호(1000) 사수번호(1005)
+-- 이순신 사원번호(1000) 
+-- 홍길동의 사수는 누구입니까?
+CREATE TABLE tableA (
+  id_a INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(10), -- 이름
+  eno int,			-- 부서번호, 직급번호
+  mgr int,			-- 사수번호, 멘토번호
+  salaty int,
+  PRIMARY KEY (id_a));
+insert into tableA values(null,'홍길동1',1000,null,100); -- 사수가 없다
+insert into tableA values(null,'홍길동2',1001,1000,100); 
+insert into tableA values(null,'홍길동3',1002,1001,100); 
+insert into tableA values(null,'홍길동4',1003,1002,100); 
+select * from tableA;
+
+-- 셀프조인: 반드시 별칭이 있어야한다
+select * from tableA t1, tableA t2;
+
+select * from tableA t1, tableA t2
+where t1.eno = t2.mgr;
+
+select * from tableA t1, tableA t2
+where t2.mgr =  t1.eno;
+
+-- ex56) 동명이인 검색
+CREATE TABLE tableA (
+  id_a INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(10), -- 이름
+  PRIMARY KEY (id_a));
+insert into tableA values(null,'홍길동2'); 
+insert into tableA values(null,'홍길동3'); 
+insert into tableA values(null,'홍길동2'); 
+insert into tableA values(null,'홍길동6'); 
+insert into tableA values(null,'홍길동1'); 
+insert into tableA values(null,'홍길동7'); 
+insert into tableA values(null,'홍길동8'); 
+insert into tableA values(null,'홍길동4'); 
+insert into tableA values(null,'홍길동5'); 
+
+-- 아이디가 다르면서 이름이 동일한 것을 찾아야 동명이인을 찾을 수 있음
+select * from tableA t1, tableA t2
+where t1.id_a !=  t2.id_a and t1.name = t2.name;
+
+select distinct(t1.name) from tableA t1, tableA t2
+where t1.id_a !=  t2.id_a and t1.name = t2.name;
+
+select distinct(t1.id_a) from tableA t1, tableA t2
+where t1.id_a !=  t2.id_a and t1.name = t2.name;
+
+
 -- 교차조인, 내부조인, 등가조인          (일반조인, 안시조인)
+-- 자연조인, Using 조인, 비등가조인
