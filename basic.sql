@@ -719,6 +719,120 @@ where t1.id_a !=  t2.id_a and t1.name = t2.name;
 select distinct(t1.id_a) from tableA t1, tableA t2
 where t1.id_a !=  t2.id_a and t1.name = t2.name;
 
+-- ex57) 세미조인: 메인쿼리에서 로우를 하나씩 가져와서 
+-- 				 서브쿼리에서 exists로 존재 여부를 묻는 조인
+-- <-> 안티조인: 세미조인이 존재하는 것을 찾는다면 안티조인은 존재하지 않는 것을 찾음
+/*
+메인쿼리	  서브쿼리
+메뉴테이블   판매테이블
+짜장		  짜장	
+짬뽕		  짜장
+냉면		  짬뽕
+		  짜장
+		  짬뽕
+*/
+create table menu(
+	foodnum int,				
+    name varchar(20)	
+);
+insert into menu values(1, '짜장');
+insert into menu values(2, '우동');
+insert into menu values(3, '냉면');
+insert into menu values(4, '탕슉');
+insert into menu values(5, '양장');
 
+create table sell(
+	no int,				-- 판매번호
+    count varchar(20),	-- 판매수량
+    foodnum int			-- 판매된 음식번호
+);
+insert into sell values(1, 2, 1);
+insert into sell values(2, 3, 2);
+insert into sell values(3, 8, 2);
+insert into sell values(4, 4, 2);
+insert into sell values(5, 1, 1);
+
+select s.foodnum from sell s;
+
+select *
+from menu m
+-- where d.foodnum = 1 or d.foodnum = 2;
+-- where m.foodnum in (1, 2); 위 코드와 동일
+-- where m.foodnum in (1, 2, 2, 2, 1); 위 코드와 동일
+where m.foodnum in(select s.foodnum from sell s); -- 위 코드와 동일
+
+-- 세미조인
+select * from menu m
+where exists(
+	select * from sell s
+    where m.foodnum = s.foodnum
+);
+
+-- 안티조인
+select * from menu m
+where not exists(
+	select * from sell s
+    where m.foodnum = s.foodnum
+);
+
+-- ex58) 외부조인(outer join)
+create table tableA(
+	id int,
+    name varchar(20)
+);
+create table tableB(
+	id int,
+    age int
+);
+
+insert into tableA values(1, 'tiger01');
+insert into tableA values(2, 'tiger02');
+insert into tableA values(3, 'tiger03');
+insert into tableA values(4, 'tiger04');
+insert into tableA values(5, 'tiger05');
+
+insert into tableB values(3, 30);
+insert into tableB values(4, 40);
+insert into tableB values(5, 50);
+insert into tableB values(6, 60);
+insert into tableB values(7, 70);
+
+-- a의 1, 2는 빠지고 b의 6, 7은 빠짐
+select *
+from tableA t1, tableB t2
+where t1.id = t2.id;
+
+-- 1,2 포함해서 나옴
+select *
+from tableA t1
+	left join tableB t2
+	on t1.id = t2.id;
+-- 6,7 포함해서 나옴
+select *
+from tableA t1
+	right join tableB t2
+	on t1.id = t2.id;
+    
+/*
+전체 교수명단과 그 교수가 담당하는 과목의 이름을 검색하세요
+일반 조인을 사용하면 강감찬은 전체 교수 명단에서 빠짐 - 외부조인 사용하기 
+교수테이블			 과목테이블
+이름		과목번호    과목번호    교과목이름
+홍길동 	1		 1		   수학
+안중근	null	 2         영어
+홍길동 	2
+이순신 	2
+강감찬 	null
+쿼리 결과는?
+홍길동  영어
+홍길동  수학
+안중근  null
+이순신  영어
+강감찬  null
+*/
+-- --------내부조인---------
 -- 교차조인, 내부조인, 등가조인          (일반조인, 안시조인)
 -- 자연조인, Using 조인, 비등가조인
+-- 셀프조인, 세미조인(안티조인)
+-- --------외부조인---------
+-- leftjoin, rightjoin
