@@ -830,6 +830,92 @@ from tableA t1
 이순신  영어
 강감찬  null
 */
+
+-- ex59) group by: ~별로(그룹별로, 부서별로, 학과별로, 팀별로)
+-- 그룹조건: having
+-- ex) 그룹별 평균(avg)급여, 그룹별 사원수(count), 그룹별 최대연봉(max)
+create table tableA(
+	eno int, 
+    salary int
+);
+
+insert into tableA values(10, 800);
+insert into tableA values(20, 200);
+insert into tableA values(20, 400);
+insert into tableA values(10, 500);
+insert into tableA values(20, 300);
+
+select * from tableA;
+
+-- group by를 사용해서 select할때는 컬럼명을 사용하는 것이 일반적이다.
+select eno, sum(salary)
+from tableA
+group by eno;
+
+-- 급여가 300이상인 직원들을 그룹별로 검색하세요.
+select eno, sum(salary)
+from tableA
+where salary>300 -- select를 필터링한다.
+group by eno; 
+
+-- group by에서 조건 걸때는 having
+select eno, sum(salary)
+from tableA
+group by eno
+having sum(salary) > 1000; -- grouping된 결과를 필터링 
+
+select eno, sum(salary)
+from tableA
+where salary>300
+group by eno
+having sum(salary) > 1000; -- grouping된 결과를 필터링 
+
+/*
+sql쿼리 실행 순서
+① FROM
+② ON
+③ JOIN
+④ WHERE
+⑤ GROUP BY
+⑥ CUBE | ROLLUP
+⑦ HAVING
+⑧ SELECT
+⑨ DISTINCT
+⑩ ORDER BY
+⑪ TOP
+*/
+-- uq: unique key 삭제되고 다시 들어올때 동일 한 값 부여 가능
+-- b: binary 대소문자 구분 체크 
+
+-- ex60)binary
+CREATE TABLE `db01`.`tablea` (
+  `id` INT NOT NULL auto_increment,
+  `name` VARCHAR(45) BINARY NULL,
+  PRIMARY KEY (`id`));
+
+insert into tableA values(1, 'Tiger');
+insert into tableA values(2, 'tiger');
+insert into tableA values(3, 'tiger');
+insert into tableA values(4, 'Tiger');
+insert into tableA values(5, 'TigerLion');
+
+select * from tableA
+where name = 'Tiger';
+
+-- un >> unsigned의 약자: 음수사용불가 ex.나이 / int 양수의 범위를 두배로 사용가능
+-- zf >> zerofill의 약자: 빈자리를 0으로 채울까요 말까요
+
+CREATE TABLE `db01`.`tableb` (
+  `id` INT NOT NULL auto_increment,
+  `name` VARCHAR(45) BINARY NULL,
+  age int(3) ZEROFILL NULL, -- 4자리수 밖에 데이터 못받음
+  PRIMARY KEY (`id`));
+  
+insert into tableB values(null, 'tiger', 23); -- 023으로 나옴
+select * from tableB;
+
+-- g >> generate의 약자: 
+
 -- --------내부조인---------
 -- 교차조인, 내부조인, 등가조인          (일반조인, 안시조인)
 -- 자연조인, Using 조인, 비등가조인
