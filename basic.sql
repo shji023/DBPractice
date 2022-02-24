@@ -914,9 +914,11 @@ CREATE TABLE `db01`.`tableb` (
 insert into tableB values(null, 'tiger', 23); -- 023으로 나옴
 select * from tableB;
 
--- g >> generate의 약자: 
+-- g >> generate의 약자:  ? 이걸몰랐네 ㅋㅋ
 
--- --------내부조인---------
+
+
+
 -- 교차조인, 내부조인, 등가조인          (일반조인, 안시조인)
 -- 자연조인, Using 조인, 비등가조인
 -- 셀프조인, 세미조인(안티조인)
